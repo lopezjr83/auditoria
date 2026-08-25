@@ -17,12 +17,12 @@ function ErrorContent() {
         </div>
 
         <div className="space-y-3">
-          <Button asChild className="w-full">
-            <Link href="/auth/login">Volver a intentar</Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/">Ir a inicio</Link>
-          </Button>
+          <Link href="/auth/login">
+            <Button className="w-full">Volver a intentar</Button>
+          </Link>
+          <Link href="/">
+            <Button variant="outline" className="w-full">Ir a inicio</Button>
+          </Link>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
