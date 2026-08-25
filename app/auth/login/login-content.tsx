@@ -18,16 +18,17 @@ export default function LoginContent() {
     setError('')
     setIsLoading(true)
 
-    try {
-      await signIn('credentials', {
-        email,
-        password,
-        redirectTo: callbackUrl,
-      })
-    } catch (error) {
-      console.error('Login error:', error)
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (result?.error) {
       setError('Email o contraseña inválidos')
       setIsLoading(false)
+    } else if (result?.ok) {
+      window.location.href = callbackUrl
     }
   }
 

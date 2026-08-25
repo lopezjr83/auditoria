@@ -42,11 +42,17 @@ export default function RegisterContent() {
       }
 
       // Auto-login después de registro
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
-        redirectTo: '/dashboard',
+        redirect: false,
       })
+
+      if (result?.ok) {
+        window.location.href = '/dashboard'
+      } else {
+        setError('Registro exitoso. Por favor inicia sesión.')
+      }
     } catch (error) {
       console.error('Register error:', error)
       setError('Error al registrarse')
