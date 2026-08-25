@@ -37,7 +37,6 @@ export function ChaosToOrder({
       const t = progress // 0 a 1
       const squareSize = 25
       const gridSize = 6
-      const spacing = 15
 
       // Dispersos aleatoriamente (caótico)
       for (let i = 0; i < gridSize * gridSize; i++) {
