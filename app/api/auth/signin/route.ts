@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -22,8 +23,14 @@ export async function POST(request: Request) {
       return Response.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    return Response.json({ success: true });
+    // Credentials are valid - redirect to next-auth endpoint
+    // This will use the next-auth internal mechanism to establish session
+    redirect(`/api/auth/callback/credentials?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
   } catch (error) {
+    // Check if it's a redirect (which is expected)
+    if ((error as any)?.message === 'NEXT_REDIRECT') {
+      throw error; // Re-throw redirect errors
+    }
     console.error("[signin] Error:", error);
     return Response.json({ error: "An error occurred" }, { status: 500 });
   }
