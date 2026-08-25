@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signInAction } from "@/app/auth/actions";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -15,10 +14,28 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const result = await signInAction(email, password);
+      const response = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (!result.success) {
-        setError(result.error || "Invalid email or password");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.error || "Invalid email or password");
+        return;
+      }
+
+      // On successful authentication, call next-auth signIn to establish session
+      const signInResponse = await fetch("/api/auth/callback/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (signInResponse.ok) {
+        window.location.href = "/dashboard";
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
