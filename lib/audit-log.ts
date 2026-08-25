@@ -19,8 +19,8 @@ export async function logAuditChange(params: {
       action: params.action,
       entityType: params.entityType,
       entityId: params.entityId,
-      changes: params.changes || null,
-      description: params.reason || null,
+      changes: params.changes,
+      description: params.reason,
       ipAddress: params.ipAddress,
     },
   })
