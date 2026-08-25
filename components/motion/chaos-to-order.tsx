@@ -14,9 +14,9 @@ export function ChaosToOrder({
   className = ''
 }: ChaosToOrderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const startTimeRef = useRef<number>(Date.now())
-  const intersectionRef = useRef<IntersectionObserver>()
+  const intersectionRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
