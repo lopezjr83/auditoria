@@ -18,17 +18,26 @@ export default function LoginContent() {
     setError('')
     setIsLoading(true)
 
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    })
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
 
-    if (result?.error) {
-      setError('Email o contraseña inválidos')
-      setIsLoading(false)
-    } else if (result?.ok) {
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error || 'Error al iniciar sesión')
+        setIsLoading(false)
+        return
+      }
+
+      // Login exitoso, redirigir al dashboard
       window.location.href = callbackUrl
+    } catch (error) {
+      console.error('Login error:', error)
+      setError('Error al iniciar sesión')
+      setIsLoading(false)
     }
   }
 
