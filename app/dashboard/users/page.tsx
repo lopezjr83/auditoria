@@ -38,7 +38,7 @@ const STATUS_COLORS: Record<User['status'], string> = {
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(MOCK_USERS)
+  const [users] = useState<User[]>(MOCK_USERS)
   const [showInviteForm, setShowInviteForm] = useState(false)
 
   return (
