@@ -1,7 +1,7 @@
 // Mock database en memoria — será reemplazado con Prisma
 // Los datos se persisten durante la sesión, se pierden al reiniciar
 
-import { Audit, Finding, CAP, AuditStatus, FindingSeverity, CAPStatus } from '@/types'
+import { Audit, Finding, CAP } from '@/types'
 
 interface MockDB {
   audits: Map<string, Audit>
