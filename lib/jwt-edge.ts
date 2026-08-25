@@ -1,17 +1,17 @@
-import { jwtVerify, SignJWT } from "jose";
+import { jwtVerify, SignJWT, type JWTPayload as JoseJWTPayload } from "jose";
 
 const SECRET = new TextEncoder().encode(
   process.env.AUTH_SECRET || "dev-secret-key-change-in-production"
 );
 
-export interface JWTPayload {
+export interface JWTPayload extends JoseJWTPayload {
   userId: string;
   email: string;
   role: string;
 }
 
-export async function signJWTEdge(payload: JWTPayload): Promise<string> {
-  const token = await new SignJWT(payload)
+export async function signJWTEdge(payload: Omit<JWTPayload, 'iat' | 'exp'>): Promise<string> {
+  const token = await new SignJWT(payload as Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("30d")
     .sign(SECRET);
