@@ -19,19 +19,14 @@ export default function LoginContent() {
     setIsLoading(true)
 
     try {
-      const result = await signIn('credentials', {
+      await signIn('credentials', {
         email,
         password,
         redirectTo: callbackUrl,
       })
-
-      if (result?.error) {
-        setError('Email o contraseña inválidos')
-      }
     } catch (error) {
       console.error('Login error:', error)
-      setError('Error al iniciar sesión')
-    } finally {
+      setError('Email o contraseña inválidos')
       setIsLoading(false)
     }
   }
