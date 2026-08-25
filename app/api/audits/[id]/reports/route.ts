@@ -4,7 +4,7 @@ import { getAudit, getFindings } from '@/lib/mock-db'
 import { Report } from '@/types'
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
