@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyJWT } from "@/lib/jwt";
 
 export const config = {
   matcher: [
@@ -10,10 +11,15 @@ export const config = {
 };
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("next-auth.session-token")?.value ||
-    request.cookies.get("__Secure-next-auth.session-token")?.value;
+  const token = request.cookies.get("auth-token")?.value;
 
   if (!token) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  // Verify JWT token
+  const payload = verifyJWT(token);
+  if (!payload) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
