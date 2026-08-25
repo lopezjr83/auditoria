@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { signInAction } from "@/app/auth/actions";
 
 export function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,18 +15,11 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await signInAction(email, password);
 
-      if (!response.ok) {
-        setError("Invalid email or password");
-        return;
+      if (!result.success) {
+        setError(result.error || "Invalid email or password");
       }
-
-      router.push("/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");
       console.error(err);
