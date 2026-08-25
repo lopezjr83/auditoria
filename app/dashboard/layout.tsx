@@ -1,19 +1,25 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ThemeToggle } from '@/components/theme-toggle'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  if (status === 'loading') {
+  useEffect(() => {
+    setMounted(true)
+    if (status === 'unauthenticated') {
+      redirect('/auth/login')
+    }
+  }, [status])
+
+  if (!mounted || status === 'loading') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Cargando...</div>
@@ -22,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   if (!session) {
-    redirect('/auth/login')
+    return null
   }
 
   return (
@@ -103,6 +109,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     </div>
   )
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <DashboardLayoutContent>{children}</DashboardLayoutContent>
 }
 
 function NavLink({
