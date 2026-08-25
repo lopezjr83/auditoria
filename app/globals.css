@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme inline {
+  /* Tipografía — Per §2 Playbook */
+  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-heading: system-ui, -apple-system, sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+  /* Paleta AuditorIA: Psicología de Auditoría & Seguridad */
+  /* Verde verificación (h=145) — cumplimiento ✓ */
+  /* Rojo hallazgo (h=15) — no-conformidades */
+  /* Azul confianza (h=200) — trazabilidad & control */
+
+  --color-background: oklch(0.98 0.001 0);
+  --color-foreground: oklch(0.13 0.04 245);
+
+  /* Primary: Azul confianza (h=200, como en antes pero confirmado para auditoría) */
+  --color-primary: oklch(0.50 0.25 200);
+  --color-primary-foreground: oklch(1 0 0);
+
+  /* Secondary: Verde verificación suave */
+  --color-secondary: oklch(0.60 0.16 145);
+  --color-secondary-foreground: oklch(1 0 0);
+
+  --color-muted: oklch(0.94 0.01 240);
+  --color-muted-foreground: oklch(0.46 0.03 240);
+
+  /* Accent: Rojo hallazgo para CTAs críticos */
+  --color-accent: oklch(0.58 0.22 15);
+  --color-accent-foreground: oklch(1 0 0);
+
+  /* Destructive: Rojo hallazgo (CRITICAL) */
+  --color-destructive: oklch(0.62 0.25 15);
+  --color-destructive-foreground: oklch(1 0 0);
+
+  /* Success: Verde verificación (CAP cerrado) */
+  --color-success: oklch(0.65 0.18 145);
+  --color-success-foreground: oklch(1 0 0);
+
+  /* Warning: Naranja alerta (CAP próximo a vencer) */
+  --color-warning: oklch(0.68 0.20 45);
+  --color-warning-foreground: oklch(1 0 0);
+
+  /* Info: Azul confianza (información, trazabilidad) */
+  --color-info: oklch(0.50 0.25 200);
+  --color-info-foreground: oklch(1 0 0);
+
+  --color-border: oklch(0.90 0.01 240);
+  --color-input: oklch(0.90 0.01 240);
+  --color-ring: oklch(0.50 0.25 200);
+
+  --color-card: oklch(0.98 0.001 0);
+  --color-card-foreground: oklch(0.13 0.04 245);
+
+  /* Elevación — sombras */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-raised: 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-overlay: 0 10px 15px rgba(0, 0, 0, 0.2);
+
+  /* Radios */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-background: oklch(0.14 0.04 245);
+    --color-foreground: oklch(0.98 0.001 0);
+
+    --color-primary: oklch(0.51 0.23 245);
+    --color-primary-foreground: oklch(0.14 0.04 245);
+
+    --color-secondary: oklch(0.62 0.18 200);
+    --color-secondary-foreground: oklch(0.14 0.04 245);
+
+    --color-muted: oklch(0.26 0.04 240);
+    --color-muted-foreground: oklch(0.65 0.03 240);
+
+    --color-accent: oklch(0.62 0.18 200);
+    --color-accent-foreground: oklch(0.14 0.04 245);
+
+    --color-destructive: oklch(0.62 0.21 15);
+    --color-destructive-foreground: oklch(0.98 0.001 0);
+
+    --color-success: oklch(0.65 0.15 145);
+    --color-success-foreground: oklch(0.14 0.04 245);
+
+    --color-warning: oklch(0.70 0.18 45);
+    --color-warning-foreground: oklch(0.14 0.04 245);
+
+    --color-info: oklch(0.51 0.23 245);
+    --color-info-foreground: oklch(0.14 0.04 245);
+
+    --color-border: oklch(0.26 0.04 240);
+    --color-input: oklch(0.26 0.04 240);
+    --color-ring: oklch(0.51 0.23 245);
+
+    --color-card: oklch(0.20 0.03 245);
+    --color-card-foreground: oklch(0.98 0.001 0);
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-background: oklch(0.14 0.04 245);
+  --color-foreground: oklch(0.98 0.001 0);
+
+  --color-primary: oklch(0.51 0.23 245);
+  --color-primary-foreground: oklch(0.14 0.04 245);
+
+  --color-secondary: oklch(0.62 0.18 200);
+  --color-secondary-foreground: oklch(0.14 0.04 245);
+
+  --color-muted: oklch(0.26 0.04 240);
+  --color-muted-foreground: oklch(0.65 0.03 240);
+
+  --color-accent: oklch(0.62 0.18 200);
+  --color-accent-foreground: oklch(0.14 0.04 245);
+
+  --color-destructive: oklch(0.62 0.21 15);
+  --color-destructive-foreground: oklch(0.98 0.001 0);
+
+  --color-success: oklch(0.65 0.15 145);
+  --color-success-foreground: oklch(0.14 0.04 245);
+
+  --color-warning: oklch(0.70 0.18 45);
+  --color-warning-foreground: oklch(0.14 0.04 245);
+
+  --color-info: oklch(0.51 0.23 245);
+  --color-info-foreground: oklch(0.14 0.04 245);
+
+  --color-border: oklch(0.26 0.04 240);
+  --color-input: oklch(0.26 0.04 240);
+  --color-ring: oklch(0.51 0.23 245);
+
+  --color-card: oklch(0.20 0.03 245);
+  --color-card-foreground: oklch(0.98 0.001 0);
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold;
+}
+
+p {
+  @apply text-base leading-relaxed;
+}
+
+a {
+  @apply text-primary hover:underline;
+}
+
+button {
+  @apply transition-colors;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Motion tokens per §16 Playbook */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+[data-reveal].revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
