@@ -33,7 +33,11 @@ export default function LoginContent() {
       }
 
       // Login exitoso, redirigir al dashboard
-      window.location.href = callbackUrl
+      const redirectUrl = callbackUrl || '/dashboard'
+      console.log('✅ Login exitoso, redirigiendo a:', redirectUrl)
+      setTimeout(() => {
+        window.location.href = redirectUrl
+      }, 500)
     } catch (error) {
       console.error('Login error:', error)
       setError('Error al iniciar sesión')
