@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth'
 import { getAuditLogs } from '@/lib/mock-db'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

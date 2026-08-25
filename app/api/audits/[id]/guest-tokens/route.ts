@@ -4,7 +4,7 @@ import { createGuestToken, getGuestTokensByAudit } from '@/lib/mock-db'
 import { GuestToken } from '@/types'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -24,7 +24,7 @@ export async function GET(
 }
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
