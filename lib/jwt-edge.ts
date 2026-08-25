@@ -1,8 +1,10 @@
 import { jwtVerify, SignJWT, type JWTPayload as JoseJWTPayload } from "jose";
 
-const SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "dev-secret-key-change-in-production"
-);
+const authSecret = process.env.AUTH_SECRET || "dev-secret-key-change-in-production";
+console.log("[jwt-edge] AUTH_SECRET available:", !!process.env.AUTH_SECRET);
+console.log("[jwt-edge] Using SECRET starting with:", authSecret.substring(0, 10) + "...");
+
+const SECRET = new TextEncoder().encode(authSecret);
 
 export interface JWTPayload extends JoseJWTPayload {
   userId: string;
