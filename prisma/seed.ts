@@ -42,22 +42,25 @@ async function main() {
   console.log(`✅ Workspace created: ${workspace.name}`);
 
   // Add Admin as Owner to Workspace
-  const member = await prisma.workspaceMember.upsert({
-    where: {
-      userId_workspaceId: {
-        userId: superAdmin.id,
-        workspaceId: workspace.id,
-      },
-    },
-    update: {},
-    create: {
+  const member = await prisma.workspaceMember.create({
+    data: {
       userId: superAdmin.id,
       workspaceId: workspace.id,
       role: "OWNER",
     },
+  }).catch(async () => {
+    // If already exists, just fetch it
+    return prisma.workspaceMember.findFirst({
+      where: {
+        userId: superAdmin.id,
+        workspaceId: workspace.id,
+      },
+    });
   });
 
-  console.log(`✅ Admin added to workspace as ${member.role}`);
+  if (member) {
+    console.log(`✅ Admin added to workspace as ${member.role}`);
+  }
 
   // Create AuditTypes
   const auditTypes = [
@@ -88,7 +91,9 @@ async function main() {
       where: { code: auditType.code },
       update: {},
       create: {
-        ...auditType,
+        code: auditType.code,
+        name: auditType.name,
+        description: auditType.description,
         checklist: {}, // Empty checklist for now
       },
     });
