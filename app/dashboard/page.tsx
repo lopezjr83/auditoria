@@ -2,16 +2,24 @@
 
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export default function DashboardPage() {
   const { data: session } = useSession()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-4xl font-black text-foreground mb-2">
-          Bienvenido, {session?.user?.name}
+          Bienvenido, {session?.user?.name || 'Usuario'}
         </h1>
         <p className="text-muted-foreground">
           Gestiona tus auditorías, hallazgos y reportes en un solo lugar.
