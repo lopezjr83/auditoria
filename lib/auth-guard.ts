@@ -1,11 +1,38 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { verifyJWT } from "@/lib/jwt";
+import { prisma } from "@/lib/prisma";
 
 export async function requireAuth() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/auth/login");
-  return session;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token) {
+    redirect("/auth/login");
+  }
+
+  const payload = verifyJWT(token);
+  if (!payload) {
+    redirect("/auth/login");
+  }
+
+  // Fetch user from database
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId },
+  });
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  };
 }
 
 export async function requireRole(requiredRole: string) {
