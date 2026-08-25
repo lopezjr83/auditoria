@@ -73,6 +73,4 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-const handler = NextAuth(authOptions);
-export const { auth, signIn, signOut } = handler;
-export { handler as handlers };
+export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
