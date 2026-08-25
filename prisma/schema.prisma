@@ -169,7 +169,6 @@ model Audit {
   caps        CorrectiveAction[]
   evidence    Evidence[]
   guestTokens GuestToken[]
-  auditLogs   AuditLog[]
   report      Report?
 
   @@map("audits")
