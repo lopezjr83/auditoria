@@ -1,7 +1,7 @@
 # claude.md — Instrucciones para Claude Agents en vp-auditoria
 
 > **Propósito:** Guía de convenciones, conocimiento de dominio, y referencias de VisionProces para agents Claude en este proyecto.
-> **Última actualización:** 2026-08-24
+> **Última actualización:** 2026-08-25 (MVP v1.0 COMPLETADO)
 
 ---
 
@@ -621,10 +621,31 @@ Cuando necesites encontrar código:
 
 ---
 
-## 15. Cambios Recientes (Fase 0 → Fase 1)
+## 15. Cambios Recientes (Fase 0 → MVP v1.0 ✅ COMPLETADO)
 
-- ✅ Completado: PLANIFICACION.md con roadmap de 14 semanas
-- ✅ Completado: memory.md con decisiones clave
-- ⏳ **Próximo: Iniciar Fase 1 Week 1 — Project setup**
+### Fase 0: Preparación ✅ 
+- ✅ Plan + Schema + Pricing model
+- ✅ Landing design + Docs
 
-Cuando comiences a implementar features, actualiza este archivo con nuevos patrones/convenciones que surjan.
+### MVP v1.0 Deployment ✅ (2026-08-25)
+- ✅ **Next.js 15 + TypeScript** — Strict mode, todas las optimizaciones
+- ✅ **Auth.js v5** — Google OAuth + Email/Password, NextAuth callbacks
+- ✅ **Prisma 7 + Neon PostgreSQL** — Schema sincronizado, BD conectada
+- ✅ **Multi-tenant dashboard** — Workspaces, roles RBAC (OWNER/ADMIN/AUDITOR/SUPERVISOR)
+- ✅ **Auditorías SMETA/ISO** — Pre-cargadas con checklists de 50+ items
+- ✅ **Hallazgos + CAPs** — Trazabilidad inmutable (audit log), gestión de acciones correctivas
+- ✅ **Acceso temporal** — QR auditor externo + tokens ephemeral (7 días default)
+- ✅ **Reportes** — Stub implementado, preparado para generación con Gemini
+- ✅ **Dark mode** — Toggle con next-themes, tokens OKLCH 3-capas
+- ✅ **GDPR endpoints** — Export + Delete implementados
+- ✅ **Vercel deployment** — Live en https://auditoria-delta.vercel.app
+- ✅ **CI/CD** — Vercel auto-deploy en cada push a main
+- ✅ **Pricing escalable** — Usuarios en bandas + auditorías lineales ($0-$2,105/mes)
+
+### Próxima Fase: Fase 2 Intelligence (3-4 meses)
+- 📅 Calendario + notificaciones automáticas
+- 🤖 IA predictiva (Gemini L4)
+- 📊 Dashboard KPIs + análisis tendencias
+- 🔗 Integraciones (Google Drive sync, Zapier, Slack)
+
+Cuando comiences Fase 2, actualiza este archivo con nuevos patrones/convenciones que surjan.
