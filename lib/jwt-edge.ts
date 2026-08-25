@@ -1,0 +1,32 @@
+import { jwtVerify, SignJWT } from "jose";
+
+const SECRET = new TextEncoder().encode(
+  process.env.AUTH_SECRET || "dev-secret-key-change-in-production"
+);
+
+export interface JWTPayload {
+  userId: string;
+  email: string;
+  role: string;
+}
+
+export async function signJWTEdge(payload: JWTPayload): Promise<string> {
+  const token = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("30d")
+    .sign(SECRET);
+
+  return token;
+}
+
+export async function verifyJWTEdge(
+  token: string
+): Promise<JWTPayload | null> {
+  try {
+    const verified = await jwtVerify(token, SECRET);
+    return verified.payload as unknown as JWTPayload;
+  } catch (error) {
+    console.error("[verifyJWTEdge] Verification failed:", (error as Error).message);
+    return null;
+  }
+}

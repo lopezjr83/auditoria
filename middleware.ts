@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyJWT } from "@/lib/jwt";
+import { verifyJWTEdge } from "@/lib/jwt-edge";
 
 export const config = {
   matcher: [
@@ -10,7 +10,7 @@ export const config = {
   ],
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth-token")?.value;
 
   console.log("[middleware] Path:", request.nextUrl.pathname);
@@ -21,8 +21,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  // Verify JWT token
-  const payload = verifyJWT(token);
+  // Verify JWT token using edge-compatible jose
+  const payload = await verifyJWTEdge(token);
   console.log("[middleware] Token valid:", !!payload);
 
   if (!payload) {

@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { signJWT } from "@/lib/jwt";
+import { signJWTEdge } from "@/lib/jwt-edge";
 import { redirect } from "next/navigation";
 
 export async function loginAction(formData: FormData) {
@@ -28,8 +28,8 @@ export async function loginAction(formData: FormData) {
     redirect("/auth/error?error=Invalid email or password");
   }
 
-  // Create JWT token
-  const token = signJWT({
+  // Create JWT token using edge-compatible jose
+  const token = await signJWTEdge({
     userId: user.id,
     email: user.email || email,
     role: user.role || "USER",
