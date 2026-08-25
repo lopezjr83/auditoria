@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Nivel 2: Fuzzy match en keywords
     const keywords = message.toLowerCase().split(' ')
     const docs = getKnowledgeDocs().filter(d =>
-      d.tags.some(tag => keywords.some(kw => tag.includes(kw)))
+      d.tags.some((tag: string) => keywords.some((kw: string) => tag.includes(kw)))
     )
 
     if (docs.length > 0) {
