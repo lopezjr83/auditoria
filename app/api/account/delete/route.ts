@@ -1,15 +1,15 @@
 import { auth } from '@/lib/auth'
-import { Response } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   const session = await auth()
   if (!session) {
-    return Response.json({ error: 'Not authenticated' }, { status: 401 })
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const { confirm } = await req.json()
+  const { confirm } = await request.json()
   if (confirm !== 'DELETE_MY_ACCOUNT') {
-    return Response.json(
+    return NextResponse.json(
       { error: 'Confirmation required. Pass confirm: "DELETE_MY_ACCOUNT"' },
       { status: 400 }
     )
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   // TODO: Log deletion in audit trail
   // TODO: Send confirmation email
 
-  return Response.json({
+  return NextResponse.json({
     message: 'Account deletion requested. You will receive a confirmation email.',
     deletedAt: new Date().toISOString(),
   })
