@@ -1,5 +1,5 @@
-import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export const config = {
   matcher: [
@@ -9,13 +9,13 @@ export const config = {
   ],
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default auth((req: any) => {
-  const isLoggedIn = !!req.auth;
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("next-auth.session-token")?.value ||
+    request.cookies.get("__Secure-next-auth.session-token")?.value;
 
-  if (!isLoggedIn) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
   return NextResponse.next();
-});
+}
