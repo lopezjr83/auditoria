@@ -1,7 +1,6 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -12,7 +11,6 @@ export default function RegisterContent() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
-  const router = useRouter()
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
