@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { signIn } from '@/lib/auth'
 
 export async function POST(req: Request) {
   try {
