@@ -1,0 +1,343 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models (Standard Auth.js)
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  workspaceMembers WorkspaceMember[]
+  auditLogs        AuditLog[]
+  chatMessages     ChatMessage[]
+
+  @@map("users")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  sessionToken String   @unique
+  userId    String
+  expires   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Multi-Tenant Workspace
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  description String?
+  logo      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members       WorkspaceMember[]
+  subscriptions Subscription[]
+  audits        Audit[]
+  guestTokens   GuestToken[]
+  auditLogs     AuditLog[]
+  reports       Report[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id        String   @id @default(cuid())
+  userId    String
+  workspaceId String
+  role      String   @default("AUDITOR") // OWNER, ADMIN, AUDITOR, SUPERVISOR, VIEWER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@map("workspace_members")
+}
+
+// Subscription & Billing
+model Subscription {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  customerId      String   // Recurrente customer ID
+  subscriptionId  String   // Recurrente subscription ID
+  plan            String   // Tier 0 (FREE), Tier 1, etc.
+  status          String   @default("active") // active, canceled, overdue
+
+  // Pricing components
+  basePrice       Int      @default(0)    // cents
+  userBandPrice   Int      @default(0)
+  auditPrice      Int      @default(0)
+  currentUsers    Int      @default(1)
+  currentAudits   Int      @default(1)
+
+  periodStart     DateTime
+  periodEnd       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  canceledAt      DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, customerId])
+  @@map("subscriptions")
+}
+
+// Audit Types
+model AuditType {
+  id        String   @id @default(cuid())
+  code      String   @unique // SMETA, ISO_9001, ISO_14001, ISO_45001
+  name      String
+  description String?
+  checklist Json     // Checklist structure
+  createdAt DateTime @default(now())
+
+  audits Audit[]
+
+  @@map("audit_types")
+}
+
+// Audits
+model Audit {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  auditTypeId     String
+  title           String
+  description     String?
+  status          String   @default("planning") // planning, in_progress, completed, archived
+
+  scheduledDate   DateTime?
+  startDate       DateTime?
+  endDate         DateTime?
+
+  auditorNotes    String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  auditType   AuditType     @relation(fields: [auditTypeId], references: [id])
+
+  findings    Finding[]
+  caps        CorrectiveAction[]
+  evidence    Evidence[]
+  guestTokens GuestToken[]
+  auditLogs   AuditLog[]
+  report      Report?
+
+  @@map("audits")
+}
+
+// Findings (Hallazgos)
+model Finding {
+  id          String   @id @default(cuid())
+  auditId     String
+  code        String   // NC-001, NC-002, etc.
+  severity    String   // CRITICAL, MAJOR, MINOR, OBSERVATION
+  description String   @db.Text
+  location    String?
+  rootCause   String?  @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  audit          Audit              @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  correctiveActions CorrectiveAction[]
+  evidence       Evidence[]
+
+  @@map("findings")
+}
+
+// Corrective Action Plans (CAPs)
+model CorrectiveAction {
+  id          String   @id @default(cuid())
+  findingId   String
+  auditId     String
+  code        String   // CAP-001, CAP-002, etc.
+
+  title       String
+  description String  @db.Text
+  owner       String  // Responsible person
+  dueDate     DateTime
+
+  status      String  @default("open") // open, in_progress, completed, overdue, closed
+  completionDate DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  finding Finding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  audit   Audit   @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@map("corrective_actions")
+}
+
+// Evidence (Links to external storage)
+model Evidence {
+  id          String   @id @default(cuid())
+  auditId     String
+  findingId   String?
+
+  fileName    String
+  fileType    String  // photo, document, screenshot
+  externalUrl String  // URL to Google Drive / OneDrive / S3
+  storageProvider String // google_drive, onedrive, s3
+
+  uploadedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  audit   Audit   @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  finding Finding? @relation(fields: [findingId], references: [id], onDelete: SetNull)
+
+  @@map("evidence")
+}
+
+// Guest Access Tokens (QR + Ephemeral Links)
+model GuestToken {
+  id          String   @id @default(cuid())
+  auditId     String
+  workspaceId String
+
+  token       String   @unique
+  type        String   // qr, link
+  expiresAt   DateTime
+
+  createdAt   DateTime @default(now())
+
+  audit     Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("guest_tokens")
+}
+
+// Audit Log (Immutable Trail)
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  userId      String
+
+  action      String  // CREATE_AUDIT, UPDATE_FINDING, CLOSE_CAP, etc.
+  entity      String  // Audit, Finding, CorrectiveAction, etc.
+  entityId    String
+
+  oldValue    Json?   // Previous state
+  newValue    Json?   // New state
+
+  hash        String  // SHA-256 for immutability
+  ipAddress   String?
+
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// Reports
+model Report {
+  id        String   @id @default(cuid())
+  auditId   String   @unique
+  workspaceId String
+
+  format    String   @default("pdf") // pdf, excel, html
+  fileName  String
+  fileUrl   String   // Stored in external storage
+
+  generatedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  audit     Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+// ChatBot Knowledge Base
+model AuditorFAQ {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  category  String   // SMETA, ISO_9001, ISO_14001, ISO_45001, GENERAL
+  tags      String[] // searchable tags
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("auditor_faq")
+}
+
+model KnowledgeDoc {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  standard  String   // SMETA, ISO_9001, etc.
+  category  String   // Requirements, Best Practices, Templates
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("knowledge_docs")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+
+  prompt    String   @db.Text
+  response  String   @db.Text
+  level     Int      // 1 (FAQ), 2 (Fuzzy), 3 (Docs), 4 (Gemini)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
