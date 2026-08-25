@@ -5,7 +5,7 @@ import { Finding } from '@/types'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -13,7 +13,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const findings = getFindings(params.id)
+    const { id } = await params
+    const findings = getFindings(id)
     return NextResponse.json(findings)
   } catch (error) {
     console.error('Get findings error:', error)
@@ -23,7 +24,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -31,6 +32,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const { description, severity, standard, location } = await request.json()
 
     if (!description || !severity) {
@@ -39,7 +41,7 @@ export async function POST(
 
     const finding: Finding = {
       id: `find-${Date.now()}`,
-      auditId: params.id,
+      auditId: id,
       description,
       severity,
       standard,

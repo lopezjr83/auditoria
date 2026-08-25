@@ -4,7 +4,7 @@ import { getAudit, updateAudit, deleteAudit } from '@/lib/mock-db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -12,7 +12,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const audit = getAudit(params.id)
+    const { id } = await params
+    const audit = getAudit(id)
     if (!audit) {
       return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
     }
@@ -26,7 +27,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -34,8 +35,9 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const updates = await request.json()
-    const audit = updateAudit(params.id, updates)
+    const audit = updateAudit(id, updates)
 
     if (!audit) {
       return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
@@ -50,7 +52,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -58,7 +60,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const deleted = deleteAudit(params.id)
+    const { id } = await params
+    const deleted = deleteAudit(id)
     if (!deleted) {
       return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
     }

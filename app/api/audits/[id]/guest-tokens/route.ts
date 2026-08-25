@@ -5,15 +5,17 @@ import { GuestToken } from '@/types'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
     if (!session?.user) {
+    
+    const { id } = await params
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const tokens = getGuestTokensByAudit(params.id)
+    const tokens = getGuestTokensByAudit(id)
     return NextResponse.json(tokens)
   } catch (error) {
     console.error('Get guest tokens error:', error)
@@ -23,11 +25,13 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
     if (!session?.user) {
+    
+    const { id } = await params
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -42,7 +46,7 @@ export async function POST(
     const guestToken: GuestToken = {
       id: `gt-${Date.now()}`,
       token,
-      auditId: params.id,
+      auditId: id,
       accessType,
       guestEmail,
       guestName,

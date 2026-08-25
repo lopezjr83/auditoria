@@ -5,26 +5,28 @@ import { Report } from '@/types'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
     if (!session?.user) {
+    
+    const { id } = await params
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { format = 'PDF' } = await request.json()
 
-    const audit = getAudit(params.id)
+    const audit = getAudit(id)
     if (!audit) {
       return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
     }
 
-    const findings = getFindings(params.id)
+    const findings = getFindings(id)
 
     const report: Report = {
       id: `rep-${Date.now()}`,
-      auditId: params.id,
+      auditId: id,
       title: `${audit.title} - Reporte ${new Date().toLocaleDateString()}`,
       format: format as any,
       generatedBy: session.user.id!,
