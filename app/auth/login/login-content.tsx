@@ -32,12 +32,15 @@ export default function LoginContent() {
         return
       }
 
+      const data = await res.json()
+      console.log('✅ Login exitoso:', data)
+
       // Login exitoso, redirigir al dashboard
       const redirectUrl = callbackUrl || '/dashboard'
-      console.log('✅ Login exitoso, redirigiendo a:', redirectUrl)
-      setTimeout(() => {
-        window.location.href = redirectUrl
-      }, 500)
+      console.log('🚀 Redirigiendo a:', redirectUrl)
+
+      // Usar router de Next.js para mejor compatibilidad
+      window.location.replace(redirectUrl)
     } catch (error) {
       console.error('Login error:', error)
       setError('Error al iniciar sesión')
