@@ -7,12 +7,13 @@ import { AuditDetails } from "@/components/audits/audit-details";
 export default async function AuditPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   await requireAuth();
+  const { id } = await params;
 
   const audit = await prisma.audit.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       auditType: true,
       findings: {
