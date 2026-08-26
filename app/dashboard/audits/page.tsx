@@ -3,7 +3,6 @@ import { requireAuth } from "@/lib/auth-guard";
 import { getAudits } from "./actions";
 import { CreateAuditDialog } from "@/components/audits/create-audit-dialog";
 import { prisma } from "@/lib/prisma";
-import { AuditsClient } from "@/components/audits/audits-client";
 
 const statusColors: Record<string, string> = {
   planning: "bg-blue-100 text-blue-800",
