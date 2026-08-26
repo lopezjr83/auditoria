@@ -14,8 +14,8 @@ interface AuditDetailsProps {
 
 const tabs = ["Questions", "Findings", "CAPs", "Evidence", "Timeline"];
 
-export function AuditDetails({ audit }: AuditDetailsProps) {
-  const [activeTab, setActiveTab] = useState("Findings");
+export function AuditDetails({ audit, questions, responses }: AuditDetailsProps) {
+  const [activeTab, setActiveTab] = useState("Questions");
 
   const statusColors: Record<string, string> = {
     planning: "bg-blue-100 text-blue-800",
