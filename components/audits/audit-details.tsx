@@ -4,12 +4,15 @@ import { useState } from "react";
 import { FindingsTab } from "./tabs/findings-tab";
 import { CapsTab } from "./tabs/caps-tab";
 import { EvidenceTab } from "./tabs/evidence-tab";
+import { QuestionsTab } from "./questions-tab";
 
 interface AuditDetailsProps {
   audit: any;
+  questions?: any[];
+  responses?: any[];
 }
 
-const tabs = ["Findings", "CAPs", "Evidence", "Timeline"];
+const tabs = ["Questions", "Findings", "CAPs", "Evidence", "Timeline"];
 
 export function AuditDetails({ audit }: AuditDetailsProps) {
   const [activeTab, setActiveTab] = useState("Findings");
@@ -85,6 +88,13 @@ export function AuditDetails({ audit }: AuditDetailsProps) {
         </div>
 
         <div className="p-6">
+          {activeTab === "Questions" && questions && responses && (
+            <QuestionsTab
+              auditId={audit.id}
+              questions={questions}
+              responses={responses}
+            />
+          )}
           {activeTab === "Findings" && <FindingsTab audit={audit} />}
           {activeTab === "CAPs" && <CapsTab audit={audit} />}
           {activeTab === "Evidence" && <EvidenceTab audit={audit} />}

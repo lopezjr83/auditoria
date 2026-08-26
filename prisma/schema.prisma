@@ -148,9 +148,54 @@ model AuditType {
   checklist Json     // Checklist structure
   createdAt DateTime @default(now())
 
-  audits Audit[]
+  audits    Audit[]
+  questions AuditQuestion[]
 
   @@map("audit_types")
+}
+
+// Audit Questions (Pre-loaded checklist items)
+model AuditQuestion {
+  id              String   @id @default(cuid())
+  auditTypeId     String
+  section         String   // e.g., "SMETA Pillar 1: Labour"
+  subsection      String   // e.g., "Child Labour Prevention"
+  question        String   @db.Text // Exact question from standard
+  scoringType     String   @default("BINARY") // BINARY, SCALE_1_5
+  autoFindingIfNo Boolean  @default(true) // Auto-generate Finding if answer is NO
+  findingSeverity String?  // CRITICAL, MAJOR, MINOR, OBSERVATION
+  weight          Int      @default(1) // Importance weight for SMETA variations
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  auditType AuditType      @relation(fields: [auditTypeId], references: [id], onDelete: Cascade)
+  responses AuditResponse[]
+
+  @@index([auditTypeId])
+  @@map("audit_questions")
+}
+
+// Audit Responses (Answers to questions)
+model AuditResponse {
+  id                 String   @id @default(cuid())
+  auditId            String
+  questionId         String
+
+  answer             String   // YES, NO, N/A
+  evidence           String?  @db.Text // Notes/evidence for the answer
+  generatedFindingId String?  // Foreign key if auto-generated Finding
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  audit    Audit          @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  question AuditQuestion  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([auditId, questionId])
+  @@index([auditId])
+  @@index([questionId])
+  @@map("audit_responses")
 }
 
 // Audits
@@ -178,6 +223,7 @@ model Audit {
   evidence    Evidence[]
   guestTokens GuestToken[]
   report      Report?
+  responses   AuditResponse[]
 
   @@map("audits")
 }

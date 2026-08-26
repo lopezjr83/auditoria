@@ -15,7 +15,13 @@ export default async function AuditPage({
   const audit = await prisma.audit.findUnique({
     where: { id },
     include: {
-      auditType: true,
+      auditType: {
+        include: {
+          questions: {
+            orderBy: [{ section: "asc" }, { subsection: "asc" }],
+          },
+        },
+      },
       findings: {
         include: {
           correctiveActions: true,
@@ -23,6 +29,7 @@ export default async function AuditPage({
       },
       caps: true,
       evidence: true,
+      responses: true,
     },
   });
 
@@ -45,7 +52,11 @@ export default async function AuditPage({
         </div>
       </div>
 
-      <AuditDetails audit={audit} />
+      <AuditDetails
+        audit={audit}
+        questions={audit.auditType?.questions}
+        responses={audit.responses}
+      />
     </div>
   );
 }
