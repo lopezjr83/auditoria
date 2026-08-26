@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { verifyJWT } from "@/lib/jwt";
+import { verifyJWTEdge } from "@/lib/jwt-edge";
 import { prisma } from "@/lib/prisma";
 
 export async function requireAuth() {
@@ -11,7 +11,7 @@ export async function requireAuth() {
     redirect("/auth/login");
   }
 
-  const payload = verifyJWT(token);
+  const payload = await verifyJWTEdge(token);
   if (!payload) {
     redirect("/auth/login");
   }
