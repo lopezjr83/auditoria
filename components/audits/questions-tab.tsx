@@ -11,6 +11,25 @@ const severityColors: Record<string, string> = {
   OBSERVATION: "bg-blue-100 text-blue-800",
 };
 
+const translations = {
+  en: {
+    answered: "answered",
+    of: "of",
+    noAnswer: "NO answer will auto-generate a",
+    finding: "finding",
+    yes: "Yes",
+    no: "No",
+  },
+  es: {
+    answered: "respondidas",
+    of: "de",
+    noAnswer: "Respuesta NO auto-generará un hallazgo",
+    finding: "hallazgo",
+    yes: "Sí",
+    no: "No",
+  },
+};
+
 interface Question {
   id: string;
   section: string;
@@ -41,8 +60,9 @@ export function QuestionsTab({
 }: QuestionsTabProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const [language, setLanguage] = useState<"en" | "es">("en");
   const [expandedSection, setExpandedSection] = useState<string | null>(
-    questions.length > 0 ? questions[0].section : null
+    questions.length > 0 ? (language === "en" ? questions[0].section : questions[0].section_es || questions[0].section) : null
   );
 
   const responseMap = new Map(responses.map((r) => [r.questionId, r]));
@@ -83,8 +103,34 @@ export function QuestionsTab({
 
   return (
     <div className="space-y-4">
+      {/* Language Selector */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setLanguage("en")}
+          className={`px-4 py-2 rounded font-medium transition-colors ${
+            language === "en"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+          }`}
+        >
+          English
+        </button>
+        <button
+          onClick={() => setLanguage("es")}
+          className={`px-4 py-2 rounded font-medium transition-colors ${
+            language === "es"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+          }`}
+        >
+          Español
+        </button>
+      </div>
+
       {sections.map((section) => {
-        const sectionQuestions = questions.filter((q) => q.section === section);
+        const sectionQuestions = questions.filter(
+          (q) => (language === "en" ? q.section : q.section_es || q.section) === section
+        );
         const isExpanded = expandedSection === section;
 
         return (
@@ -103,7 +149,8 @@ export function QuestionsTab({
                       responseMap.has(q.id)
                     ).length
                   }{" "}
-                  of {sectionQuestions.length} answered
+                  {translations[language].of} {sectionQuestions.length}{" "}
+                  {translations[language].answered}
                 </p>
               </div>
               <span className="text-gray-500">
@@ -124,14 +171,15 @@ export function QuestionsTab({
                     >
                       <div className="space-y-2">
                         <p className="text-xs font-medium text-gray-600 uppercase">
-                          {question.subsection}
+                          {language === "en" ? question.subsection : question.subsection_es || question.subsection}
                         </p>
                         <p className="text-sm font-medium text-gray-900">
-                          {question.question}
+                          {language === "en" ? question.question : question.question_es || question.question}
                         </p>
                         {question.autoFindingIfNo && (
                           <p className="text-xs text-orange-700 bg-orange-50 p-2 rounded">
-                            ⚠️ NO answer will auto-generate a {question.findingSeverity} finding
+                            ⚠️ {language === "en" ? "NO answer will auto-generate a" : "Respuesta NO auto-generará un"} {question.findingSeverity}{" "}
+                            {language === "en" ? "finding" : "hallazgo"}
                           </p>
                         )}
                       </div>
@@ -159,14 +207,14 @@ export function QuestionsTab({
                               disabled={isLoading}
                               className="px-3 py-1 text-sm font-medium text-green-700 bg-green-100 hover:bg-green-200 rounded transition-colors disabled:opacity-50"
                             >
-                              Yes
+                              {language === "en" ? "Yes" : "Sí"}
                             </button>
                             <button
                               onClick={() => handleResponse(question.id, "NO")}
                               disabled={isLoading}
                               className="px-3 py-1 text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors disabled:opacity-50"
                             >
-                              No
+                              {language === "en" ? "No" : "No"}
                             </button>
                             <button
                               onClick={() => handleResponse(question.id, "N/A")}

@@ -158,9 +158,17 @@ model AuditType {
 model AuditQuestion {
   id              String   @id @default(cuid())
   auditTypeId     String
+
+  // English
   section         String   // e.g., "SMETA Pillar 1: Labour"
   subsection      String   // e.g., "Child Labour Prevention"
   question        String   @db.Text // Exact question from standard
+
+  // Spanish translations
+  section_es      String?
+  subsection_es   String?
+  question_es     String?  @db.Text
+
   scoringType     String   @default("BINARY") // BINARY, SCALE_1_5
   autoFindingIfNo Boolean  @default(true) // Auto-generate Finding if answer is NO
   findingSeverity String?  // CRITICAL, MAJOR, MINOR, OBSERVATION
