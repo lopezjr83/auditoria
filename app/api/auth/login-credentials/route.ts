@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { signJWT } from "@/lib/jwt";
+import { signJWTEdge } from "@/lib/jwt-edge";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     // Create JWT token
-    const token = signJWT({
+    const token = await signJWTEdge({
       userId: user.id,
       email: user.email || email,
       role: user.role || "USER",
