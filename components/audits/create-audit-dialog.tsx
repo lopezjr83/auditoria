@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createAudit } from "@/app/dashboard/audits/actions";
 
 interface CreateAuditDialogProps {
   workspaceId: string;
   auditTypes: Array<{ id: string; name: string }>;
-  onSuccess: () => void;
 }
 
 export function CreateAuditDialog({
   workspaceId,
   auditTypes,
-  onSuccess,
 }: CreateAuditDialogProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,7 +36,7 @@ export function CreateAuditDialog({
 
       setFormData({ title: "", auditTypeId: "", description: "" });
       setOpen(false);
-      onSuccess();
+      router.refresh();
     } catch (error) {
       console.error("Error creating audit:", error);
       alert("Failed to create audit");

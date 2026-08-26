@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createCAP } from "@/app/dashboard/audits/[id]/caps/actions";
 
 interface CreateCAPDialogProps {
   auditId: string;
   findings: any[];
   selectedFindingId?: string;
-  onSuccess: () => void;
 }
 
 export function CreateCAPDialog({
   auditId,
   findings,
   selectedFindingId,
-  onSuccess,
 }: CreateCAPDialogProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,7 +52,7 @@ export function CreateCAPDialog({
           .split("T")[0],
       });
       setOpen(false);
-      onSuccess();
+      router.refresh();
     } catch (error) {
       console.error("Error creating CAP:", error);
       alert("Failed to create CAP");

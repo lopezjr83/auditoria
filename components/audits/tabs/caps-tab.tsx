@@ -16,17 +16,12 @@ interface CapsTabProps {
 }
 
 export function CapsTab({ audit }: CapsTabProps) {
-  const handleCAPAdded = () => {
-    window.location.reload();
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
         <CreateCAPDialog
           auditId={audit.id}
           findings={audit.findings}
-          onSuccess={handleCAPAdded}
         />
       </div>
 

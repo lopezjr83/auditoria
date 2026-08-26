@@ -11,18 +11,14 @@ interface FindingsTabProps {
 export function FindingsTab({ audit }: FindingsTabProps) {
   const [findings, setFindings] = useState(audit.findings);
 
-  const handleFindingAdded = () => {
-    window.location.reload();
-  };
-
   const handleFindingDeleted = () => {
-    window.location.reload();
+    setFindings(findings.filter((f: any) => f.id !== null));
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <CreateFindingDialog auditId={audit.id} onSuccess={handleFindingAdded} />
+        <CreateFindingDialog auditId={audit.id} />
       </div>
 
       {findings.length === 0 ? (

@@ -48,7 +48,6 @@ export default async function AuditsPage() {
         <CreateAuditDialog
           workspaceId={workspaceId}
           auditTypes={auditTypes}
-          onSuccess={() => {}}
         />
       </div>
 

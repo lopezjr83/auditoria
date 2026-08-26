@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createFinding } from "@/app/dashboard/audits/[id]/findings/actions";
 
 interface CreateFindingDialogProps {
   auditId: string;
-  onSuccess: () => void;
 }
 
 const severityOptions = [
@@ -17,8 +17,8 @@ const severityOptions = [
 
 export function CreateFindingDialog({
   auditId,
-  onSuccess,
 }: CreateFindingDialogProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ export function CreateFindingDialog({
         rootCause: "",
       });
       setOpen(false);
-      onSuccess();
+      router.refresh();
     } catch (error) {
       console.error("Error creating finding:", error);
       alert("Failed to create finding");
