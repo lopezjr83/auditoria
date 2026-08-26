@@ -1,7 +1,35 @@
+import Link from "next/link";
 import { requireAuth } from "@/lib/auth-guard";
+import { getAudits } from "./actions";
+import { CreateAuditDialog } from "@/components/audits/create-audit-dialog";
+import { prisma } from "@/lib/prisma";
+import { AuditsClient } from "@/components/audits/audits-client";
+
+const statusColors: Record<string, string> = {
+  planning: "bg-blue-100 text-blue-800",
+  in_progress: "bg-yellow-100 text-yellow-800",
+  completed: "bg-green-100 text-green-800",
+  archived: "bg-gray-100 text-gray-800",
+};
 
 export default async function AuditsPage() {
-  await requireAuth();
+  const session = await requireAuth();
+
+  // TODO: Get workspace ID from session/context
+  // For now, get first workspace of the user
+  const workspaceMember = await prisma.workspaceMember.findFirst({
+    where: { userId: session.user.id },
+    include: { workspace: true },
+  });
+
+  if (!workspaceMember) {
+    return <div className="text-center py-12 text-gray-500">No workspace found</div>;
+  }
+
+  const workspaceId = workspaceMember.workspace.id;
+
+  const audits = await getAudits(workspaceId);
+  const auditTypes = await prisma.auditType.findMany();
 
   return (
     <div className="space-y-6">
@@ -11,16 +39,18 @@ export default async function AuditsPage() {
       </div>
 
       <div className="flex justify-between items-center">
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-1">
           <input
             type="text"
             placeholder="Search audits..."
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
           />
         </div>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-          + New Audit
-        </button>
+        <CreateAuditDialog
+          workspaceId={workspaceId}
+          auditTypes={auditTypes}
+          onSuccess={() => {}}
+        />
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -37,7 +67,7 @@ export default async function AuditsPage() {
                 Status
               </th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Date
+                Findings
               </th>
               <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">
                 Actions
@@ -45,11 +75,44 @@ export default async function AuditsPage() {
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-gray-200">
-              <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                No audits yet. Create your first audit to get started!
-              </td>
-            </tr>
+            {audits.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                  No audits yet. Create your first audit to get started!
+                </td>
+              </tr>
+            ) : (
+              audits.map((audit) => (
+                <tr key={audit.id} className="border-b border-gray-200 hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    {audit.title}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {audit.auditType?.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        statusColors[audit.status] || "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {audit.status.replace("_", " ")}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {audit.findings.length} finding{audit.findings.length !== 1 ? "s" : ""}
+                  </td>
+                  <td className="px-6 py-4 text-right text-sm">
+                    <Link
+                      href={`/dashboard/audits/${audit.id}`}
+                      className="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
