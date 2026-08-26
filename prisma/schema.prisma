@@ -86,12 +86,13 @@ model Workspace {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members       WorkspaceMember[]
-  subscriptions Subscription[]
-  audits        Audit[]
-  guestTokens   GuestToken[]
-  auditLogs     AuditLog[]
-  reports       Report[]
+  members         WorkspaceMember[]
+  subscriptions   Subscription[]
+  audits          Audit[]
+  auditTemplates  AuditTemplate[]
+  guestTokens     GuestToken[]
+  auditLogs       AuditLog[]
+  reports         Report[]
 
   @@map("workspaces")
 }
@@ -139,7 +140,7 @@ model Subscription {
   @@map("subscriptions")
 }
 
-// Audit Types
+// Audit Types (Standard templates)
 model AuditType {
   id        String   @id @default(cuid())
   code      String   @unique // SMETA, ISO_9001, ISO_14001, ISO_45001
@@ -148,10 +149,56 @@ model AuditType {
   checklist Json     // Checklist structure
   createdAt DateTime @default(now())
 
-  audits    Audit[]
-  questions AuditQuestion[]
+  audits            Audit[]
+  questions         AuditQuestion[]
+  customTemplates   AuditTemplate[]
 
   @@map("audit_types")
+}
+
+// Custom Audit Templates (User-defined templates)
+model AuditTemplate {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  name            String   // e.g., "SMETA + Internal Safety"
+  description     String?
+  baseAuditTypeId String?  // Can be based on standard template
+
+  questions       CustomQuestion[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  baseType  AuditType? @relation(fields: [baseAuditTypeId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@map("audit_templates")
+}
+
+// Custom Questions for templates
+model CustomQuestion {
+  id              String   @id @default(cuid())
+  templateId      String
+
+  section         String
+  section_es      String?
+  subsection      String
+  subsection_es   String?
+  question        String   @db.Text
+  question_es     String?  @db.Text
+
+  scoringType     String   @default("BINARY")
+  autoFindingIfNo Boolean  @default(true)
+  findingSeverity String?
+  weight          Int      @default(1)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  template AuditTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@map("custom_questions")
 }
 
 // Audit Questions (Pre-loaded checklist items)

@@ -7,6 +7,7 @@ import type { Session } from "next-auth";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: "📊" },
   { name: "Audits", href: "/dashboard/audits", icon: "📋" },
+  { name: "Templates", href: "/dashboard/templates", icon: "🎯" },
   { name: "Reports", href: "/dashboard/reports", icon: "📄" },
   { name: "Settings", href: "/dashboard/settings", icon: "⚙️" },
 ];
