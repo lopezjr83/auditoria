@@ -33,8 +33,11 @@ const translations = {
 interface Question {
   id: string;
   section: string;
+  section_es?: string | null;
   subsection: string;
+  subsection_es?: string | null;
   question: string;
+  question_es?: string | null;
   findingSeverity: string | null;
   autoFindingIfNo: boolean;
 }
